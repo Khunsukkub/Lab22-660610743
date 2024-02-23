@@ -1,20 +1,91 @@
 #include <windows.h>
+#include <cstdio>
+
+HWND TextField , number1 , number2 , plusb , minorb , mutipb , divb;
+	char text1[100],text2[100];
 
 /* This is where all the input to the window goes to */
 LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
-	switch(Message) {
-		
-		/* Upon destruction, tell the main thread to stop */
-		case WM_DESTROY: {
-			PostQuitMessage(0);
-			break;
-		}
-		
-		/* All other messages (a lot of them) are processed using default procedures */
-		default:
-			return DefWindowProc(hwnd, Message, wParam, lParam);
-	}
-	return 0;
+    switch(Message) {
+        case WM_CREATE: {
+            TextField = CreateWindow("STATIC", NULL, WS_CHILD | WS_VISIBLE | WS_BORDER| ES_READONLY, 
+                                        10, 10, 200, 25, hwnd, NULL, NULL, NULL);
+            SetWindowText(TextField, "Please input two numbers");
+            number1 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER , 
+                                    10, 40, 150, 25, hwnd, NULL, NULL, NULL);
+            number2 = CreateWindow("EDIT", "", WS_VISIBLE | WS_CHILD | WS_BORDER , 
+                                    10, 70, 150, 25, hwnd, NULL, NULL, NULL);
+            plusb = CreateWindow("BUTTON", "+", WS_CHILD | WS_VISIBLE , 
+                                    10, 100, 50, 50, hwnd, (HMENU) 1, NULL, NULL);
+            minorb = CreateWindow("BUTTON", "-", WS_CHILD | WS_VISIBLE , 
+                                    60, 100, 50, 50, hwnd, (HMENU) 2, NULL, NULL);
+            mutipb = CreateWindow("BUTTON", "*", WS_CHILD | WS_VISIBLE , 
+                                    110, 100, 50, 50, hwnd, (HMENU) 3, NULL, NULL);
+            divb = CreateWindow("BUTTON", "/", WS_CHILD | WS_VISIBLE , 
+                                    160, 100, 50, 50, hwnd, (HMENU) 4, NULL, NULL);
+            break;
+        }
+
+        case WM_COMMAND: {
+            switch (LOWORD(wParam)) {
+				int n1 , n2;
+				double num1, num2 , sum;
+				char result[100];
+                case 1:
+                    n1 = GetWindowText(number1,&text1[0],100);
+					n2 = GetWindowText(number2,&text2[0],100);
+					num1 = atof(text1);
+					num2 = atof(text2);
+					sum = num1 + num2;
+					sprintf(result,"%.2f",sum);
+					::MessageBox(hwnd,result,"Result",MB_OK);
+					break;
+				case 2:
+                    GetWindowText(number1 , text1 , 100);
+                    GetWindowText(number2 , text2 , 100);
+                    num1 = atof(text1);
+                    num2 = atof(text2);
+                    sum = num1 - num2;
+
+                    sprintf(result, "%.2f", sum);
+                    ::MessageBox(NULL, result, "Result", MB_OK | MB_ICONINFORMATION);
+                    break;
+                
+				case 3:
+
+                    GetWindowText(number1 , text1 , 100);
+                    GetWindowText(number2 , text2 , 100);
+                    num1 = atof(text1);
+                    num2 = atof(text2);
+                    sum = num1 * num2;
+
+                    sprintf(result, "%.2f", sum);
+                    ::MessageBox(NULL, result, "Result", MB_OK | MB_ICONINFORMATION);
+                    break;
+                
+				case 4:
+
+                    GetWindowText(number1 , text1 , 100);
+                    GetWindowText(number2 , text2 , 100);
+                    num1 = atof(text1);
+                    num2 = atof(text2);
+                    sum = num1 / num2;
+                    sprintf(result, "%.2f", sum);
+                    ::MessageBox(NULL, result, "Result", MB_OK | MB_ICONINFORMATION);
+                    break;
+            }
+            break;
+        }
+
+        case WM_DESTROY: {
+            PostQuitMessage(0);
+            break;
+        }
+
+        default:
+            return DefWindowProc(hwnd, Message, wParam, lParam);
+    }
+    return 0;
 }
 
 /* The 'main' function of Win32 GUI programs: this is where execution starts */
@@ -31,7 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hCursor	 = LoadCursor(NULL, IDC_ARROW);
 	
 	/* White, COLOR_WINDOW is just a #define for a system color, try Ctrl+Clicking it */
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.hbrBackground = CreateSolidBrush(RGB(255, 153, 255));
 	wc.lpszClassName = "WindowClass";
 	wc.hIcon	 = LoadIcon(NULL, IDI_APPLICATION); /* Load a standard icon */
 	wc.hIconSm	 = LoadIcon(NULL, IDI_APPLICATION); /* use the name "A" to use the project icon */
@@ -41,11 +112,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Caption",WS_VISIBLE|WS_OVERLAPPEDWINDOW,
+	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","My Calculator",WS_VISIBLE|WS_SYSMENU,
 		CW_USEDEFAULT, /* x */
 		CW_USEDEFAULT, /* y */
-		640, /* width */
-		480, /* height */
+		250, /* width */
+		200, /* height */
 		NULL,NULL,hInstance,NULL);
 
 	if(hwnd == NULL) {
